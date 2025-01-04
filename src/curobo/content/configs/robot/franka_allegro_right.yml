@@ -1,0 +1,257 @@
+##
+## Copyright (c) 2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+##
+## NVIDIA CORPORATION, its affiliates and licensors retain all intellectual
+## property and proprietary rights in and to this material, related
+## documentation and any modifications thereto. Any use, reproduction,
+## disclosure or distribution of this material and related documentation
+## without an express license agreement from NVIDIA CORPORATION or
+## its affiliates is strictly prohibited.
+##
+
+robot_cfg:
+  kinematics:
+    usd_path: "FILL_THIS"
+    usd_robot_root: "/robot"
+    isaac_usd_path: ""
+    usd_flip_joints: {}
+    usd_flip_joint_limits: []
+
+    urdf_path: "robot/franka_allegro_right/franka_allegro_right.urdf"
+    asset_root_path: "robot/franka_allegro_right"
+
+    base_link: "panda_link0"
+    ee_link: "base_link"
+    link_names: []
+    lock_joints:
+      {
+        "joint_0.0": 0.0,
+        "joint_1.0": 0.7,
+        "joint_2.0": 0.0,
+        "joint_3.0": 0.4,
+        "joint_4.0": 0.0,
+        "joint_5.0": 0.7,
+        "joint_6.0": 0.0,
+        "joint_7.0": 0.4,
+        "joint_8.0": 0.0,
+        "joint_9.0": 0.7,
+        "joint_10.0": 0.0,
+        "joint_11.0": 0.4,
+        "joint_12.0": 1.0,
+        "joint_13.0": 0.0,
+        "joint_14.0": 0.0,
+        "joint_15.0": 0.0,
+      }
+    extra_links: null
+
+    collision_link_names: [
+        # panda_link0,
+        panda_link1,
+        panda_link2,
+        panda_link3,
+        panda_link4,
+        panda_link5,
+        panda_link6,
+        panda_link7,
+        base_link,
+        link_0.0,
+        link_1.0,
+        link_2.0,
+        link_3.0,
+        link_4.0,
+        link_5.0,
+        link_6.0,
+        link_7.0,
+        link_8.0,
+        link_9.0,
+        link_10.0,
+        link_11.0,
+        link_12.0,
+        link_13.0,
+        link_14.0,
+        link_15.0,
+      ]
+    collision_spheres: "spheres/franka_allegro_right.yml"
+    collision_sphere_buffer: 0.01 # float or Dict[str, float]
+    extra_collision_spheres: {}
+    self_collision_ignore:
+      {
+        "panda_link0": ["panda_link1"],
+        "panda_link1": ["panda_link2"],
+        "panda_link2": ["panda_link3"],
+        "panda_link3": ["panda_link4"],
+        "panda_link4": ["panda_link5"],
+        "panda_link5": ["panda_link6", "panda_link7", "base_link"],
+        "panda_link6": ["panda_link7"],
+        "panda_link7": ["base_link"],
+        "base_link": ["link_0.0", "link_4.0", "link_8.0", "link_12.0"],
+        "link_0.0": ["link_1.0", "link_2.0", "link_3.0"],
+        "link_1.0": ["link_2.0", "link_3.0"],
+        "link_2.0": ["link_3.0"],
+        "link_3.0": [],
+        "link_4.0": ["link_5.0", "link_6.0", "link_7.0"],
+        "link_5.0": ["link_6.0", "link_7.0"],
+        "link_6.0": ["link_7.0"],
+        "link_7.0": [],
+        "link_8.0": ["link_9.0", "link_10.0", "link_11.0"],
+        "link_9.0": ["link_10.0", "link_11.0"],
+        "link_10.0": ["link_11.0"],
+        "link_11.0": [],
+        "link_12.0": ["link_13.0", "link_14.0", "link_15.0"],
+        "link_13.0": ["link_14.0", "link_15.0"],
+        "link_14.0": ["link_15.0"],
+        "link_15.0": ["base_link"], # Not sure why this is needed, but it is...
+      }
+    self_collision_buffer: {
+        # fr3_linkX -> panda_linkX
+        "panda_link0": -0.02,
+        "panda_link1": -0.02,
+        "panda_link2": -0.02,
+        "panda_link3": -0.02,
+        "panda_link4": -0.02,
+        "panda_link5": -0.02,
+        "panda_link6": -0.02,
+        "panda_link7": -0.02,
+
+        # algr_rh_palm -> base_link
+        "base_link": -0.02,
+
+        # algr_rh_if_bs, if_px, if_md, if_ds -> link_{0..3}.0
+        "link_0.0": -0.02,
+        "link_1.0": -0.02,
+        "link_2.0": -0.02,
+        "link_3.0": -0.02,
+
+        # algr_rh_mf_bs, mf_px, mf_md, mf_ds -> link_{4..7}.0
+        "link_4.0": -0.02,
+        "link_5.0": -0.02,
+        "link_6.0": -0.02,
+        "link_7.0": -0.02,
+
+        # algr_rh_rf_bs, rf_px, rf_md, rf_ds -> link_{8..11}.0
+        "link_8.0": -0.02,
+        "link_9.0": -0.02,
+        "link_10.0": -0.02,
+        "link_11.0": -0.02,
+
+        # algr_rh_th_mp, th_bs, th_px, th_ds -> link_{12..15}.0
+        "link_12.0": -0.02,
+        "link_13.0": -0.02,
+        "link_14.0": -0.02,
+        "link_15.0": -0.02,
+      }
+
+    use_global_cumul: True
+    mesh_link_names: null # List[str]
+    external_asset_path: null # Use this to add path for externally located assets/robot folder.
+
+    cspace:
+      joint_names: [
+          # Rename Panda joints to panda_joint{1..7}
+          "panda_joint1",
+          "panda_joint2",
+          "panda_joint3",
+          "panda_joint4",
+          "panda_joint5",
+          "panda_joint6",
+          "panda_joint7",
+
+          # Rename Allegro finger joints to joint_{0..15}.0
+          "joint_0.0", # algr_rh_if_axl
+          "joint_1.0", # algr_rh_if_mcp
+          "joint_2.0", # algr_rh_if_pip
+          "joint_3.0", # algr_rh_if_dip
+          "joint_4.0", # algr_rh_mf_axl
+          "joint_5.0", # algr_rh_mf_mcp
+          "joint_6.0", # algr_rh_mf_pip
+          "joint_7.0", # algr_rh_mf_dip
+          "joint_8.0", # algr_rh_rf_axl
+          "joint_9.0", # algr_rh_rf_mcp
+          "joint_10.0", # algr_rh_rf_pip
+          "joint_11.0", # algr_rh_rf_dip
+          "joint_12.0", # algr_rh_th_cmc
+          "joint_13.0", # algr_rh_th_axl
+          "joint_14.0", # algr_rh_th_mcp
+          "joint_15.0", # algr_rh_th_ipl
+        ]
+      retract_config:
+        [
+          0,
+          -0.7854,
+          0.0,
+          -2.3562,
+          0.0,
+          1.5708,
+          0.7854,
+          2.90945620e-01,
+          7.37109400e-01,
+          5.10859200e-01,
+          1.22637060e-01,
+          1.20125350e-01,
+          5.84513500e-01,
+          3.43829930e-01,
+          6.05035000e-01,
+          -2.68431900e-01,
+          8.78457900e-01,
+          8.49713500e-01,
+          8.97218400e-01,
+          1.33282830,
+          3.47787830e-01,
+          2.09215670e-01,
+          -6.50969000e-03,
+        ]
+      null_space_weight:
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+        ]
+      cspace_distance_weight:
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+        ]
+      max_jerk: 500.0
+
+      max_acceleration: 15.0
