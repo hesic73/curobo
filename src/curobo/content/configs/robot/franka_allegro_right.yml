@@ -26,18 +26,18 @@ robot_cfg:
     lock_joints:
       {
         "joint_0.0": 0.0,
-        "joint_1.0": 0.7,
+        "joint_1.0": 0.0,
         "joint_2.0": 0.0,
-        "joint_3.0": 0.4,
+        "joint_3.0": 0.0,
         "joint_4.0": 0.0,
-        "joint_5.0": 0.7,
+        "joint_5.0": 0.0,
         "joint_6.0": 0.0,
-        "joint_7.0": 0.4,
+        "joint_7.0": 0.0,
         "joint_8.0": 0.0,
-        "joint_9.0": 0.7,
+        "joint_9.0": 0.0,
         "joint_10.0": 0.0,
-        "joint_11.0": 0.4,
-        "joint_12.0": 1.0,
+        "joint_11.0": 0.263,
+        "joint_12.0": 0.0,
         "joint_13.0": 0.0,
         "joint_14.0": 0.0,
         "joint_15.0": 0.0,
@@ -72,7 +72,34 @@ robot_cfg:
         link_15.0,
       ]
     collision_spheres: "spheres/franka_allegro_right.yml"
-    collision_sphere_buffer: 0.01 # float or Dict[str, float]
+    collision_sphere_buffer:
+      {
+        "panda_link0": 0.01,
+        "panda_link1": 0.01,
+        "panda_link2": 0.01,
+        "panda_link3": 0.01,
+        "panda_link4": 0.01,
+        "panda_link5": 0.01,
+        "panda_link6": 0.01,
+        "panda_link7": 0.01,
+        "base_link": 0.00,
+        "link_0.0": 0.00,
+        "link_1.0": 0.00,
+        "link_2.0": 0.00,
+        "link_3.0": 0.00,
+        "link_4.0": 0.00,
+        "link_5.0": 0.00,
+        "link_6.0": 0.00,
+        "link_7.0": 0.00,
+        "link_8.0": 0.00,
+        "link_9.0": 0.00,
+        "link_10.0": 0.00,
+        "link_11.0": 0.00,
+        "link_12.0": 0.00,
+        "link_13.0": 0.00,
+        "link_14.0": 0.00,
+        "link_15.0": 0.00,
+      }
     extra_collision_spheres: {}
     self_collision_ignore:
       {

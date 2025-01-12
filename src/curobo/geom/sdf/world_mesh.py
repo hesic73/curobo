@@ -622,8 +622,8 @@ class WorldMeshCollision(WorldPrimitiveCollision):
         if self._env_n_mesh is not None:
             self._env_n_mesh[:] = 0
         if self._env_mesh_names is not None:
-            self._env_mesh_names = [
-                [None for _ in range(self.cache["mesh"])] for _ in range(self.n_envs)
-            ]
+            for i in range(self.n_envs):
+                for j in range(len(self._env_mesh_names)):
+                    self._env_mesh_names[i][j] = None
 
         super().clear_cache()
