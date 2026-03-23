@@ -9,6 +9,12 @@
 # its affiliates is strictly prohibited.
 #
 
+try:
+    # Third Party
+    import isaacsim
+except ImportError:
+    pass
+
 # Third Party
 import torch
 
@@ -52,7 +58,11 @@ import argparse
 # Third Party
 import carb
 from omni.isaac.core import World
-from omni.isaac.core.materials import OmniGlass, OmniPBR
+
+try:
+    from omni.isaac.core.materials import OmniGlass, OmniPBR
+except ImportError:
+    from isaacsim.core.api.materials import OmniGlass, OmniPBR
 from omni.isaac.core.objects import cuboid, sphere
 from omni.isaac.core.utils.types import ArticulationAction
 
@@ -156,7 +166,6 @@ if __name__ == "__main__":
         tensor_args,
         collision_checker_type=CollisionCheckerType.MESH,
         collision_cache={"obb": n_obstacle_cuboids, "mesh": n_obstacle_mesh},
-        velocity_scale=0.75,
         interpolation_dt=0.02,
         ee_link_name="right_gripper",
     )
@@ -180,7 +189,11 @@ if __name__ == "__main__":
     cmd_plan = None
     articulation_controller = robot.get_articulation_controller()
     plan_config = MotionGenPlanConfig(
-        enable_graph=False, enable_graph_attempt=4, max_attempts=2, enable_finetune_trajopt=True
+        enable_graph=False,
+        enable_graph_attempt=4,
+        max_attempts=2,
+        enable_finetune_trajopt=True,
+        time_dilation_factor=0.5,
     )
 
     plan_idx = 0
@@ -198,8 +211,9 @@ if __name__ == "__main__":
             continue
         step_index = my_world.current_time_step_index
 
-        if step_index <= 2:
-            my_world.reset()
+        if step_index <= 10:
+            # my_world.reset()
+            robot._articulation_view.initialize()
             idx_list = [robot.get_dof_index(x) for x in j_names]
             robot.set_joint_positions(default_config, idx_list)
 
@@ -209,7 +223,7 @@ if __name__ == "__main__":
 
         if False and step_index % 50 == 0.0:  # No obstacle update
             obstacles = usd_help.get_obstacles_from_stage(
-                # only_paths=[obstacles_path],
+                only_paths=["/World"],
                 reference_prim_path=robot_prim_path,
                 ignore_substring=[
                     robot_prim_path,

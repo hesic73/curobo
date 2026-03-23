@@ -10,6 +10,12 @@
 #
 
 
+try:
+    # Third Party
+    import isaacsim
+except ImportError:
+    pass
+
 # Third Party
 import torch
 
@@ -120,9 +126,11 @@ def main():
             "/World/world_" + str(i) + "/",
             robot_name="robot_" + str(i),
             position=pose.position[0].cpu().numpy(),
+            initialize_world=False,
         )
         robot_list.append(r[0])
     setup_curobo_logger("warn")
+    my_world.initialize_physics()
 
     # warmup curobo instance
 
@@ -156,11 +164,11 @@ def main():
     default_config = robot_cfg["kinematics"]["cspace"]["retract_config"]
 
     print("warming up...")
-    motion_gen.warmup(
-        batch=n_envs,
-        batch_env_mode=True,
-        warmup_js_trajopt=False,
-    )
+    # motion_gen.warmup(
+    #     batch=n_envs,
+    #     batch_env_mode=True,
+    #     warmup_js_trajopt=False,
+    # )
 
     add_extensions(simulation_app, args.headless_mode)
     config = RobotWorldConfig.load_from_config(
@@ -189,9 +197,10 @@ def main():
             continue
         step_index = my_world.current_time_step_index
 
-        if step_index <= 2:
-            my_world.reset()
+        if step_index <= 10:
+            # my_world.reset()
             for robot in robot_list:
+                robot._articulation_view.initialize()
                 idx_list = [robot.get_dof_index(x) for x in j_names]
                 robot.set_joint_positions(default_config, idx_list)
 
@@ -217,6 +226,8 @@ def main():
             past_goal = ik_goal.clone()
         sim_js_names = robot_list[0].dof_names
         sim_js = robot_list[0].get_joints_state()
+        if sim_js is None:
+            continue
         full_js = JointState(
             position=tensor_args.to_device(sim_js.positions).view(1, -1),
             velocity=tensor_args.to_device(sim_js.velocities).view(1, -1) * 0.0,

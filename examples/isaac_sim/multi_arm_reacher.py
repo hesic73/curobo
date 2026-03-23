@@ -9,6 +9,12 @@
 # its affiliates is strictly prohibited.
 #
 
+try:
+    # Third Party
+    import isaacsim
+except ImportError:
+    pass
+
 
 # Third Party
 import torch
@@ -138,14 +144,12 @@ def main():
         tensor_args,
         collision_checker_type=CollisionCheckerType.MESH,
         use_cuda_graph=True,
-        num_trajopt_seeds=12,
-        num_graph_seeds=12,
         interpolation_dt=0.03,
         collision_cache={"obb": n_obstacle_cuboids, "mesh": n_obstacle_mesh},
         collision_activation_distance=0.025,
-        acceleration_scale=1.0,
         fixed_iters_trajopt=True,
-        trajopt_tsteps=40,
+        maximum_trajectory_dt=0.5,
+        ik_opt_iters=500,
     )
     motion_gen = MotionGen(motion_gen_config)
     print("warming up...")
@@ -157,6 +161,7 @@ def main():
         enable_graph=False,
         enable_graph_attempt=4,
         max_attempts=10,
+        time_dilation_factor=0.5,
     )
 
     usd_help.load_stage(my_world.stage)
@@ -217,8 +222,9 @@ def main():
 
         step_index = my_world.current_time_step_index
         # print(step_index)
-        if step_index <= 2:
-            my_world.reset()
+        if step_index <= 10:
+            # my_world.reset()
+            robot._articulation_view.initialize()
             idx_list = [robot.get_dof_index(x) for x in j_names]
             robot.set_joint_positions(default_config, idx_list)
 
@@ -231,7 +237,7 @@ def main():
         if step_index == 50 or step_index % 1000 == 0.0:
             print("Updating world, reading w.r.t.", robot_prim_path)
             obstacles = usd_help.get_obstacles_from_stage(
-                # only_paths=[obstacles_path],
+                only_paths=["/World"],
                 reference_prim_path=robot_prim_path,
                 ignore_substring=[
                     robot_prim_path,
@@ -254,6 +260,9 @@ def main():
         if target_pose is None:
             target_pose = cube_position
         sim_js = robot.get_joints_state()
+        if sim_js is None:
+            print("sim_js is None")
+            continue
         sim_js_names = robot.dof_names
         cu_js = JointState(
             position=tensor_args.to_device(sim_js.positions),
@@ -283,11 +292,10 @@ def main():
                 for si, s in enumerate(sph_list[0]):
                     spheres[si].set_world_pose(position=np.ravel(s.position))
                     spheres[si].set_radius(float(s.radius))
-        # print(sim_js.velocities)
         if (
             np.linalg.norm(cube_position - target_pose) > 1e-3
             and np.linalg.norm(past_pose - cube_position) == 0.0
-            and np.max(np.abs(sim_js.velocities)) < 0.2
+            and np.max(np.abs(sim_js.velocities)) < 0.5
         ):
             # Set EE teleop goals, use cube for simple non-vr init:
             ee_translation_goal = cube_position
@@ -300,9 +308,9 @@ def main():
             )
             # add link poses:
             link_poses = {}
-            for i in target_links.keys():
-                c_p, c_rot = target_links[i].get_world_pose()
-                link_poses[i] = Pose(
+            for k in target_links.keys():
+                c_p, c_rot = target_links[k].get_world_pose()
+                link_poses[k] = Pose(
                     position=tensor_args.to_device(c_p),
                     quaternion=tensor_args.to_device(c_rot),
                 )
@@ -329,7 +337,7 @@ def main():
                 cmd_idx = 0
 
             else:
-                carb.log_warn("Plan did not converge to a solution.  No action is being taken.")
+                carb.log_warn("Plan did not converge to a solution: " + str(result.status))
             target_pose = cube_position
         past_pose = cube_position
         if cmd_plan is not None:
